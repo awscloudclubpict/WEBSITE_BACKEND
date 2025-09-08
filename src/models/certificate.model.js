@@ -1,0 +1,42 @@
+import mongoose, { Schema } from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+
+const certificateSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true, 
+      trim: true,
+    },
+    event: {
+      type: String,
+      required: true, 
+    },
+    role: {
+      type: String,
+      required: true, 
+    },
+    organizer: {
+      type: String,
+      default: "AWS Cloud Club", 
+    },
+    date: {
+      type: Date,
+      default: Date.now, 
+    },
+    pdfPath: {
+      type: String, // Store local file path (later S3 URL)
+    },
+    issuedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User", 
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+certificateSchema.plugin(mongooseAggregatePaginate);
+
+export const Certificate = mongoose.model("Certificate", certificateSchema);
