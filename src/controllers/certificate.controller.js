@@ -5,6 +5,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import fs from "fs";
 import path from "path";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { customAlphabet } from "nanoid";
+
+// Create nanoid generator for certificate IDs
+const nanoid = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 8);
 
 const createCertificate = asyncHandler(async (req, res) => {
   const { name, event, role, organizer, date } = req.body;
@@ -13,6 +17,10 @@ const createCertificate = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Name, Event, and Role are required");
   }
 
+  // Generate unique certificate ID
+  const certificateId = `AWS-${nanoid()}`;
+
+  // Ensure /public/temp exists
   const tempDir = path.join(process.cwd(), "public", "temp");
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
@@ -21,6 +29,7 @@ const createCertificate = asyncHandler(async (req, res) => {
   const fileName = `${name.replace(/\s+/g, "_")}_${Date.now()}.pdf`;
   const filePath = path.join(tempDir, fileName);
 
+  // Load template
   const templatePath = path.join(process.cwd(), "public", "templates", "certificate-template.pdf");
   if (!fs.existsSync(templatePath)) {
     throw new ApiError(500, "Certificate template not found in /public/templates/");
@@ -31,23 +40,24 @@ const createCertificate = asyncHandler(async (req, res) => {
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
 
-  
-  const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  // Fonts
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const normalFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-  firstPage.drawText(name, {
-    x: 280,
+  // Draw text
+ firstPage.drawText(name, {
+    x: 60,   // moved left
     y: 300,
     size: 28,
-    font: helveticaBold,
-    color: rgb(0, 0, 0.8),
+    font: boldFont,
+    color: rgb(0.1, 0.1, 0.7),
   });
 
   firstPage.drawText(`${role} at ${event}`, {
-    x: 200,
-    y: 260,
+    x: 60,   // aligned with name
+    y: 270,
     size: 18,
-    font: helvetica,
+    font: normalFont,
     color: rgb(0, 0, 0),
   });
 
@@ -55,21 +65,30 @@ const createCertificate = asyncHandler(async (req, res) => {
     x: 60,
     y: 150,
     size: 14,
-    font: helvetica,
-    color: rgb(0, 0, 0),
+    font: normalFont,
   });
 
   firstPage.drawText(organizer || "AWS Cloud Club", {
     x: 400,
     y: 150,
     size: 14,
-    font: helvetica,
-    color: rgb(0, 0, 0),
+    font: normalFont,
   });
 
+  // ✅ Add unique Certificate ID at bottom
+  firstPage.drawText(`Certificate ID: ${certificateId}`, {
+    x: 60,
+    y: 80,
+    size: 12,
+    font: normalFont,
+    color: rgb(0.5, 0.5, 0.5),
+  });
+
+  // Save PDF
   const pdfBytes = await pdfDoc.save();
   fs.writeFileSync(filePath, pdfBytes);
 
+  // Save in DB
   const certificate = await Certificate.create({
     name,
     event,
@@ -78,14 +97,11 @@ const createCertificate = asyncHandler(async (req, res) => {
     date,
     pdfPath: `/public/temp/${fileName}`,
     issuedBy: req.user?._id || null,
+    certificateId, // ✅ store unique id
   });
 
-  if (!certificate) {
-    throw new ApiError(500, "Failed to create certificate");
-  }
-
   return res.status(201).json(
-    new ApiResponse(201, certificate, "Certificate created & PDF generated")
+    new ApiResponse(201, certificate, "Certificate created with unique ID & PDF generated")
   );
 });
 

@@ -5,37 +5,44 @@ const certificateSchema = new Schema(
   {
     name: {
       type: String,
-      required: true, 
+      required: true,
       trim: true,
     },
     event: {
       type: String,
-      required: true, 
+      required: true,
     },
     role: {
       type: String,
-      required: true, 
+      required: true,
     },
     organizer: {
       type: String,
-      default: "AWS Cloud Club", 
+      default: "AWS Cloud Club",
     },
     date: {
       type: Date,
-      default: Date.now, 
+      default: Date.now,
     },
     pdfPath: {
-      type: String, // Store local file path (later S3 URL)
+      type: String, 
     },
     issuedBy: {
       type: Schema.Types.ObjectId,
-      ref: "User", 
+      ref: "User",
+    },
+    certificateId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true, 
     },
   },
   {
     timestamps: true,
   }
 );
+
 
 certificateSchema.plugin(mongooseAggregatePaginate);
 
