@@ -2,7 +2,7 @@
 
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = "your_jwt_secret_here";  // Ideally store in environment variables
+const JWT_SECRET = "your_jwt_secret_here"; 
 
 export function generateToken(payload) {
     return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
