@@ -30,11 +30,13 @@
 //new code from here /....
 import express from "express";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 const MONGO_URI = "mongodb+srv://redeem_user:Redeem123@cluster0.psm60jr.mongodb.net/redeemr?retryWrites=true&w=majority&appName=Cluster0";
 
