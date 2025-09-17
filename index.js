@@ -1,16 +1,31 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const app = express();
-const PORT = process.env.PORT || 3000;
+const express = require('express')
+const mongoose = require('mongoose')
+const cors = require('cors')
+const { addBlog,getAllBlogs,getBlogById,deleteBlog } = require('./controllers/blogController.js')
+const { sendMail } = require('./controllers/emailController.js')
 
-app.use(cors());
-app.use(express.json());
+const app = express()
+app.use(cors())
+app.use(express.json())
 
-app.get('/', (req, res) => {
-  res.send('Backend is running!');
-});
+mongoose.connect("mongodb+srv://kokareshraddha5_db_user:kokareshraddha5_db_user@cluster0.0ort1bw.mongodb.net/awscc_blogs?retryWrites=true&w=majority&appName=Cluster0")
+.then(() => {
+  console.log(" MongoDB Connected Successfully")
+})
+.catch((err) => {
+  console.error(" MongoDB Connection Error:", err.message)
+})
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+app.post("/addBlog",addBlog);
+
+app.get("/blogs", getAllBlogs)
+
+app.get("/blogs/:id", getBlogById)
+
+app.delete("/blogs/:id", deleteBlog)
+
+app.post("/sendEmail", sendMail);
+
+app.listen(3001, () => {
+    console.log("Server is Running")
+})
