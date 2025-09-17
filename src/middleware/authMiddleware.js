@@ -6,7 +6,7 @@ export function authMiddleware(req, res, next) {
 
     const authHeader = req.headers.authorization;
     if (authHeader) {
-        token = authHeader.split(" ")[1];
+        token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
     } else if (req.cookies && req.cookies.token) {
         token = req.cookies.token;
     }

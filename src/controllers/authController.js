@@ -72,6 +72,37 @@ class AuthController {
         res.json({ token });
     }
 
+    async registerAdmin(req, res) {
+        const result = professionalRegisterSchema.safeParse(req.body); // Reuse professional schema for admin
+        if (!result.success) {
+            return res.status(400).json({ error: result.error.errors });
+        }
+
+        const { fullName, email, password, mobileNumber, companyName } = result.data;
+
+        const existingUser = await UserSchema.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({ error: "User already exists" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = new UserSchema({
+            fullName,
+            email,
+            password: hashedPassword,
+            mobileNumber,
+            companyName,
+            role: "admin"
+        });
+
+        await user.save();
+
+        const token = generateToken({ email, role: "admin" });
+        res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'lax' });
+        res.json({ token });
+    }
+
     async login(req, res) {
         const result = loginSchema.safeParse(req.body);
         if (!result.success) {

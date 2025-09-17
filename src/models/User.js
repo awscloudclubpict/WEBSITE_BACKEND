@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     branch: String,
     yearOfStudy: Number,
     companyName: String,
-    role: { type: String, enum: ["student", "professional"], required: true }
+    role: { type: String, enum: ["student", "professional","admin"], required: true }
 });
 
 export default mongoose.model("UserSchema", userSchema);
