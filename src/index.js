@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
+import teamMemberRoutes from "./routes/teamMemberRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 
 const app = express();
@@ -25,6 +26,8 @@ app.use("/auth", authRoutes);
 import eventRoutes from "./routes/eventRoutes.js";
 
 app.use("/events", eventRoutes);
+
+app.use("/team-members", teamMemberRoutes);
 
 app.get("/profile", authMiddleware, (req, res) => {
     res.json({ message: `Hello, ${req.user.email}, Role: ${req.user.role}` });
