@@ -1,7 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
-const { addBlog,getAllBlogs,getBlogById,deleteBlog } = require('./controllers/blogController.js')
+const { addBlog,getAllBlogs,getBlogById,getBlogByTag,deleteBlog } = require('./controllers/blogController.js')
 const { sendMail } = require('./controllers/emailController.js')
 
 const app = express()
@@ -21,6 +21,8 @@ app.post("/addBlog",addBlog);
 app.get("/blogs", getAllBlogs)
 
 app.get("/blogs/:id", getBlogById)
+
+app.get('/blogs/tag/:tag', getBlogByTag)
 
 app.delete("/blogs/:id", deleteBlog)
 

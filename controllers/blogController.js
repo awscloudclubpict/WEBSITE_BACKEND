@@ -68,6 +68,29 @@ const getBlogById = async (req, res) => {
     }
 }
 
+const getBlogByTag = async (req, res) => {
+    try {
+        const { tag } = req.params
+
+        // Find all blogs where tags array contains the given tag
+        const blogs = await Blog.find({ tags: tag })
+
+        if (!blogs || blogs.length === 0) {
+            return res.status(404).json({ error: "No blogs found with this tag" })
+        }
+
+        res.status(200).json(blogs)
+    } catch (error) {
+        console.error("Error fetching blogs by tag:", error.message)
+        res.status(500).json({ 
+            error: "Failed to fetch blogs by tag", 
+            details: error.message 
+        })
+    }
+}
+
+
+
 const deleteBlog = async (req, res) => {
     try {
         const { id } = req.params
@@ -84,4 +107,4 @@ const deleteBlog = async (req, res) => {
     }
 }
 
-module.exports = { addBlog, getAllBlogs, getBlogById, deleteBlog }
+module.exports = { addBlog, getAllBlogs, getBlogById, getBlogByTag, deleteBlog }
