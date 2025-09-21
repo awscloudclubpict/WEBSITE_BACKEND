@@ -1,23 +1,40 @@
 const Blog = require('../models/blog.model.js')
+const blogValidationSchema = require('../validation/blogValidationSchema.js'); 
+
 
 const addBlog = async (req, res) => {
+    
+        // const { blog_id, title, author_name, author_profile_url, thumbnail_image_url, short_description, tags, publish_date, share_url } = req.body
+    const validationResult = blogValidationSchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+        return res.status(400).json({
+            error: "Validation failed",
+            details: validationResult.error.errors,
+        });
+    }
+
+
     try {
-        const { blog_id, title, author_name, author_profile_url, thumbnail_image_url, short_description, tags, publish_date, share_url } = req.body
+        // const newBlog = new Blog({
+        //     blog_id,
+        //     title,
+        //     author_name,
+        //     author_profile_url,
+        //     thumbnail_image_url,
+        //     short_description,
+        //     tags,
+        //     publish_date,
+        //     share_url
+        // })
 
-        const newBlog = new Blog({
-            blog_id,
-            title,
-            author_name,
-            author_profile_url,
-            thumbnail_image_url,
-            short_description,
-            tags,
-            publish_date,
-            share_url
-        })
-
-        await newBlog.save()
-        res.status(201).json({ message: "Blog created successfully", blog: newBlog })
+        // await newBlog.save()
+        // res.status(201).json({ message: "Blog created successfully", blog: newBlog })
+        
+        const newBlog = new Blog(validationResult.data);
+        await newBlog.save();
+        res.status(201).json({ message: "Blog created successfully", blog: newBlog });
+    
     } catch (error) {
         console.error("Error adding blog:", error.message)
         res.status(500).json({ error: "Failed to create blog", details: error.message })
