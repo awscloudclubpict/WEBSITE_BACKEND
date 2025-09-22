@@ -1,19 +1,16 @@
-import { Router } from "express";
-import {
-  createCertificate,
+const express = require("express");
+const { createCertificate } = require("../controllers/certificate.controller.js");
 
-} from "../controllers/certificate.controller.js";
-
-const router = Router();
+const router = express.Router();
 
 // router.use(verifyJWT);
 
 router.route("/")
-  .post(createCertificate);   
+  .post(createCertificate);
 
 // router.route("/:certificateId")
-//   .get(getCertificateById)   
-//   .patch(updateCertificate) 
-//   .delete(deleteCertificate); 
+//   .get(getCertificateById)
+//   .patch(updateCertificate)
+//   .delete(deleteCertificate);
 
-export default router;
+module.exports = router;

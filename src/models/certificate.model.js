@@ -1,5 +1,7 @@
-import mongoose, { Schema } from "mongoose";
-import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+const mongoose = require("mongoose");
+const mongooseAggregatePaginate = require("mongoose-aggregate-paginate-v2");
+
+const { Schema } = mongoose;
 
 const certificateSchema = new Schema(
   {
@@ -25,7 +27,7 @@ const certificateSchema = new Schema(
       default: Date.now,
     },
     pdfPath: {
-      type: String, 
+      type: String,
     },
     issuedBy: {
       type: Schema.Types.ObjectId,
@@ -35,7 +37,7 @@ const certificateSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      index: true, 
+      index: true,
     },
   },
   {
@@ -43,7 +45,8 @@ const certificateSchema = new Schema(
   }
 );
 
-
 certificateSchema.plugin(mongooseAggregatePaginate);
 
-export const Certificate = mongoose.model("Certificate", certificateSchema);
+const Certificate = mongoose.model("Certificate", certificateSchema);
+
+module.exports = Certificate;
