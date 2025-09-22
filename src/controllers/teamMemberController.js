@@ -1,5 +1,6 @@
-import { createTeamMemberSchema, updateTeamMemberSchema } from "../validation/teamMemberSchemas.js";
+import { createTeamMemberSchema, createTeamMemberWithImageSchema, updateTeamMemberSchema } from "../validation/teamMemberSchemas.js";
 import TeamMember from "../models/TeamMember.js";
+import { uploadToS3 } from "../utils/s3.js";
 
 class TeamMemberController {
     async createTeamMember(req, res) {
@@ -21,6 +22,50 @@ class TeamMemberController {
             res.status(201).json({ message: "Team member created successfully", teamMember });
         } catch (error) {
             res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
+    async createTeamMemberWithImage(req, res) {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ error: "Access denied. Admins only." });
+        }
+
+        const result = createTeamMemberWithImageSchema.safeParse(req.body);
+        if (!result.success) {
+            return res.status(400).json({ error: result.error.errors });
+        }
+
+        try {
+            let profileImageUrl = null;
+
+            // Handle image upload if file is provided
+            if (req.file) {
+                const fileBuffer = req.file.buffer;
+                const fileName = req.file.originalname;
+                const mimeType = req.file.mimetype;
+
+                profileImageUrl = await uploadToS3(fileBuffer, fileName, mimeType, 'team-members');
+            }
+
+            const teamMemberData = {
+                ...result.data,
+                profileImage: profileImageUrl,
+                createdBy: req.user.email
+            };
+
+            const teamMember = new TeamMember(teamMemberData);
+            await teamMember.save();
+
+            res.status(201).json({
+                message: "Team member created successfully with image",
+                teamMember: {
+                    ...teamMember.toObject(),
+                    profileImage: profileImageUrl
+                }
+            });
+        } catch (error) {
+            console.error('Error creating team member with image:', error);
+            res.status(500).json({ error: "Failed to create team member with image" });
         }
     }
 

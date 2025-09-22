@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import {
     studentRegisterSchema,
     professionalRegisterSchema,
+    adminRegisterSchema,
     loginSchema
 } from "../validation/authSchemas.js";
 import { generateToken } from "../utils/jwt.js";
@@ -73,7 +74,7 @@ class AuthController {
     }
 
     async registerAdmin(req, res) {
-        const result = professionalRegisterSchema.safeParse(req.body); // Reuse professional schema for admin
+        const result = adminRegisterSchema.safeParse(req.body);
         if (!result.success) {
             return res.status(400).json({ error: result.error.errors });
         }

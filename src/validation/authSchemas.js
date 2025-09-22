@@ -35,6 +35,15 @@ export const professionalRegisterSchema = z
         path: ["confirmPassword"],
     });
 
+// Admin Schema (simplified, no confirmPassword required)
+export const adminRegisterSchema = z.object({
+    fullName: z.string().min(3),
+    email: z.string().email(),
+    password: z.string().min(6),
+    mobileNumber: z.string().min(10),
+    companyName: z.string().min(2),
+});
+
 // Login Schema
 export const loginSchema = z.object({
     email: z.string().email(),

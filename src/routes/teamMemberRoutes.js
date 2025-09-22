@@ -1,11 +1,32 @@
 import express from "express";
+import multer from "multer";
 import TeamMemberController from "../controllers/teamMemberController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+// Configure multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        // Accept only image files
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed!'), false);
+        }
+    }
+});
+
 // Create team member (admin only)
 router.post("/", authMiddleware, (req, res) => TeamMemberController.createTeamMember(req, res));
+
+// Create team member with image upload (admin only)
+router.post("/create-with-image", authMiddleware, upload.single('profile_image'), (req, res) => TeamMemberController.createTeamMemberWithImage(req, res));
 
 // Get team members (public)
 router.get("/", (req, res) => TeamMemberController.getTeamMembers(req, res));

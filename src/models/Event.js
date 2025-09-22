@@ -11,8 +11,7 @@ const eventSchema = new mongoose.Schema({
     status: { type: String, enum: ["Upcoming", "Ongoing", "Past"], required: true },
     category: { type: String, required: true },
     registration_link: { type: String },
-    banner_image_url: { type: String },
+    banner_image_url: { type: String },  // ✅ Perfect for S3 image URL
     createdBy: { type: String, required: true } // email of creator
 });
-
 export default mongoose.model("Event", eventSchema);
