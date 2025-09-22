@@ -16,12 +16,8 @@ const certificateSchema = new Schema(
     },
     role: {
       type: String,
-      required: true,
     },
-    organizer: {
-      type: String,
-      default: "AWS Cloud Club",
-    },
+    
     date: {
       type: Date,
       default: Date.now,

@@ -19,7 +19,7 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 // Routes declaration
-app.use("/api/v1/create-certificate", certificateRouter);
+app.use("/api/v1/certificate", certificateRouter);
 
 // http://localhost:8000/api/v1/users/register
 
