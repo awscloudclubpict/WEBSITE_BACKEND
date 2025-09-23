@@ -62,17 +62,27 @@ const MONGO_URI =
   process.env.MONGO_URI ||
   "mongodb+srv://kokareshraddha5_db_user:kokareshraddha5_db_user@cluster0.0ort1bw.mongodb.net/awscc_blogs?retryWrites=true&w=majority&appName=Cluster0";
 
-mongoose
-  .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
+let isConnected = false;
+
+const connectToDatabase = async () => {
+  if (isConnected) {
+    return;
+  }
+
+  try {
+    await mongoose.connect(MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    });
+    isConnected = true;
     console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
+  } catch (err) {
     console.error("MongoDB connection error:", err);
-  });
+    // Don't throw error in serverless environment
+  }
+};
 
 app.use("/iamatharva", (req, res) => {
   res.send("API is running...");
