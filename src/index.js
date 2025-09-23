@@ -50,6 +50,7 @@ import authRoutes from "./routes/authRoutes.js";
 import teamMemberRoutes from "./routes/teamMemberRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import eventRoutes from "./routes/eventRoutes.js";
+import certificateRouter from "./routes/certificate.route.js";
 
 const app = express();
 
@@ -134,6 +135,7 @@ app.get("/test", (req, res) => {
 app.use("/auth", dbMiddleware, authRoutes);
 app.use("/events", dbMiddleware, eventRoutes);
 app.use("/team-members", dbMiddleware, teamMemberRoutes);
+app.use("/certificate", certificateRouter);
 
 app.get("/profile", dbMiddleware, authMiddleware, (req, res) => {
   res.json({ message: `Hello, ${req.user.email}, Role: ${req.user.role}` });
