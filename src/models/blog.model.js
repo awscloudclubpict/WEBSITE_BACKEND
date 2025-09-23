@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose';
 
 const blogSchema = new mongoose.Schema({
     blog_id: { type: String, required: true, unique: true }, 
@@ -10,8 +10,8 @@ const blogSchema = new mongoose.Schema({
     tags: { type: [String] },  // array of tags/categories for identification
     publish_date: { type: Date, default: Date.now },
     share_url: { type: String } 
-})
+});
 
-const Blog = mongoose.model("blogs", blogSchema)
+const Blog = mongoose.model("blogs", blogSchema);
 
-module.exports = Blog
+export default Blog;

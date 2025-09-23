@@ -1,4 +1,4 @@
-const Blog = require('../../models/blog.model.js')
+import Blog from '../src/models/blog.model.js';
 
 const addBlog = async (req, res) => {
     try {
@@ -67,4 +67,4 @@ const deleteBlog = async (req, res) => {
     }
 }
 
-module.exports = { addBlog, getAllBlogs, getBlogById, deleteBlog }
+export { addBlog, getAllBlogs, getBlogById, deleteBlog };
