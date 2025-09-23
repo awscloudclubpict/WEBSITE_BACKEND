@@ -11,7 +11,7 @@ app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://redeem_user:Redeem123@cluster0.psm60jr.mongodb.net/redeemr?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://kokareshraddha5_db_user:kokareshraddha5_db_user@cluster0.0ort1bw.mongodb.net/awscc_blogs?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
@@ -22,6 +22,10 @@ mongoose.connect(MONGO_URI, {
     console.error("MongoDB connection error:", err);
 });
 
+
+// app.use("/", (req, res) => {
+//     res.send("API is running...");
+// });
 app.use("/auth", authRoutes);
 import eventRoutes from "./routes/eventRoutes.js";
 
