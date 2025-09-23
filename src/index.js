@@ -70,13 +70,19 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
+// Add request logging for debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
 const MONGO_URI =
   process.env.MONGO_URI ||
   "mongodb+srv://kokareshraddha5_db_user:kokareshraddha5_db_user@cluster0.0ort1bw.mongodb.net/awscc_blogs?retryWrites=true&w=majority&appName=Cluster0";
 
 let isConnected = false;
 
-// For Vercel serverless deployment, we need to connect to DB on each request
+// Middleware to ensure database connection for each request (only for routes that need DB)
 const connectToDatabase = async () => {
   if (isConnected) {
     return;
@@ -95,28 +101,39 @@ const connectToDatabase = async () => {
   }
 };
 
-// Middleware to ensure database connection for each request
-app.use(async (req, res, next) => {
-  await connectToDatabase();
-  next();
+// Database middleware only for routes that need it
+const dbMiddleware = async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    res.status(500).json({ error: "Database connection failed" });
+  }
+};
+
+app.get("/", (req, res) => {
+  res.json({ message: "AWSCC Backend API", status: "running", timestamp: new Date().toISOString() });
 });
 
-app.use("/iamatharva", (req, res) => {
+app.get("/iamatharva", (req, res) => {
   res.json({ message: "API is running!", status: "success" });
 });
 
 // Simple test endpoint without database
-app.use("/test", (req, res) => {
+app.get("/test", (req, res) => {
   res.json({
     message: "Test endpoint working!",
     timestamp: new Date().toISOString(),
   });
 });
-app.use("/auth", authRoutes);
-app.use("/events", eventRoutes);
-app.use("/team-members", teamMemberRoutes);
 
-app.get("/profile", authMiddleware, (req, res) => {
+// Apply database middleware only to routes that need it
+app.use("/auth", dbMiddleware, authRoutes);
+app.use("/events", dbMiddleware, eventRoutes);
+app.use("/team-members", dbMiddleware, teamMemberRoutes);
+
+app.get("/profile", dbMiddleware, authMiddleware, (req, res) => {
   res.json({ message: `Hello, ${req.user.email}, Role: ${req.user.role}` });
 });
 
