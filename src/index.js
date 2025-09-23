@@ -23,9 +23,9 @@ mongoose.connect(MONGO_URI, {
 });
 
 
-// app.use("/", (req, res) => {
-//     res.send("API is running...");
-// });
+app.use("/iamatharva", (req, res) => {
+    res.send("API is running...");
+});
 app.use("/auth", authRoutes);
 import eventRoutes from "./routes/eventRoutes.js";
 
