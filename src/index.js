@@ -85,7 +85,12 @@ const connectToDatabase = async () => {
 };
 
 app.use("/iamatharva", (req, res) => {
-  res.send("API is running...");
+  res.json({ message: "API is running!", status: "success" });
+});
+
+// Simple test endpoint without database
+app.use("/test", (req, res) => {
+  res.json({ message: "Test endpoint working!", timestamp: new Date().toISOString() });
 });
 app.use("/auth", authRoutes);
 app.use("/events", eventRoutes);
