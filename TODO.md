@@ -1,0 +1,9 @@
+- [ ] Update package.json to add cookie-parser dependency
+- [ ] Update src/index.js to add cookie-parser middleware
+- [ ] Update src/controllers/authController.js to set HTTP-only cookie in register and login methods
+- [ ] Update src/middleware/authMiddleware.js to check for token in cookies if not in header
+- [ ] Update src/routes/authRoutes.js to add logout route
+- [ ] Install dependencies
+- [ ] Test login/register endpoints
+- [ ] Test protected routes with cookie
+- [ ] Test logout

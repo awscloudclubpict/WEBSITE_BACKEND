@@ -1,0 +1,166 @@
+// import express from "express";
+// import mongoose from "mongoose";
+// import cors from "cors";
+// import cookieParser from "cookie-parser";
+// import authRoutes from "./routes/authRoutes.js";
+// import teamMemberRoutes from "./routes/teamMemberRoutes.js";
+// import { authMiddleware } from "./middleware/authMiddleware.js";
+
+// const app = express();
+// app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+// app.use(cookieParser());
+// app.use(express.json());
+
+// const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://kokareshraddha5_db_user:kokareshraddha5_db_user@cluster0.0ort1bw.mongodb.net/awscc_blogs?retryWrites=true&w=majority&appName=Cluster0";
+
+// mongoose.connect(MONGO_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// }).then(() => {
+//     console.log("Connected to MongoDB");
+// }).catch((err) => {
+//     console.error("MongoDB connection error:", err);
+// });
+
+// app.use("/iamatharva", (req, res) => {
+//     res.send("API is running...");
+// });
+// app.use("/auth", authRoutes);
+// import eventRoutes from "./routes/eventRoutes.js";
+
+// app.use("/events", eventRoutes);
+
+// app.use("/team-members", teamMemberRoutes);
+
+// app.get("/profile", authMiddleware, (req, res) => {
+//     res.json({ message: `Hello, ${req.user.email}, Role: ${req.user.role}` });
+// });
+
+// const PORT = process.env.PORT || 3001;
+// app.listen(PORT, () => {
+//     console.log(`Server running on http://localhost:${PORT}`);
+// });
+
+// src/index.js
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/authRoutes.js";
+import teamMemberRoutes from "./routes/teamMemberRoutes.js";
+import { authMiddleware } from "./middleware/authMiddleware.js";
+import eventRoutes from "./routes/eventRoutes.js";
+
+const app = express();
+
+// CORS configuration for both development and production
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === "production"
+      ? [
+          "https://your-frontend-domain.vercel.app", // Replace with your actual frontend domain
+          "https://your-custom-domain.com", // Add any custom domains
+        ]
+      : ["http://localhost:3000", "http://localhost:3001"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.use(cookieParser());
+app.use(express.json());
+
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  "mongodb+srv://kokareshraddha5_db_user:kokareshraddha5_db_user@cluster0.0ort1bw.mongodb.net/awscc_blogs?retryWrites=true&w=majority&appName=Cluster0";
+
+let isConnected = false;
+
+// For Vercel serverless deployment, we need to connect to DB on each request
+const connectToDatabase = async () => {
+  if (isConnected) {
+    return;
+  }
+
+  try {
+    await mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    });
+    isConnected = true;
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+    // Don't throw error in serverless environment
+  }
+};
+
+// Middleware to ensure database connection for each request
+app.use(async (req, res, next) => {
+  await connectToDatabase();
+  next();
+});
+
+app.use("/iamatharva", (req, res) => {
+  res.json({ message: "API is running!", status: "success" });
+});
+
+// Simple test endpoint without database
+app.use("/test", (req, res) => {
+  res.json({
+    message: "Test endpoint working!",
+    timestamp: new Date().toISOString(),
+  });
+});
+app.use("/auth", authRoutes);
+app.use("/events", eventRoutes);
+app.use("/team-members", teamMemberRoutes);
+
+app.get("/profile", authMiddleware, (req, res) => {
+  res.json({ message: `Hello, ${req.user.email}, Role: ${req.user.role}` });
+});
+
+// Global error handler for production
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+
+  if (process.env.NODE_ENV === "production") {
+    res.status(500).json({
+      message: "Internal server error",
+      error: "Something went wrong",
+    });
+  } else {
+    res.status(500).json({
+      message: "Internal server error",
+      error: err.message,
+      stack: err.stack,
+    });
+  }
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    message: "Route not found",
+    path: req.path,
+  });
+});
+
+// Only start local server if not in production/Vercel
+if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+  const PORT = process.env.PORT || 3001;
+
+  // Connect to database and start server for local development
+  connectToDatabase()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error("Failed to start server:", err);
+    });
+}
+
+// ✅ Export app for Vercel
+export default app;
