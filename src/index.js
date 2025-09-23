@@ -76,9 +76,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const MONGO_URI =
-  process.env.MONGO_URI ||
-  "mongodb+srv://kokareshraddha5_db_user:kokareshraddha5_db_user@cluster0.0ort1bw.mongodb.net/awscc_blogs?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI;
 
 let isConnected = false;
 
@@ -113,10 +111,14 @@ const dbMiddleware = async (req, res, next) => {
 };
 
 app.get("/", (req, res) => {
-  res.json({ message: "AWSCC Backend API", status: "running", timestamp: new Date().toISOString() });
+  res.json({
+    message: "AWSCC Backend API",
+    status: "running",
+    timestamp: new Date().toISOString(),
+  });
 });
 
-app.get("/iamatharva", (req, res) => {
+app.get("/imaatharva", (req, res) => {
   res.json({ message: "API is running!", status: "success" });
 });
 
@@ -163,21 +165,23 @@ app.use((req, res) => {
   });
 });
 
-// Only start local server if not in production/Vercel
-if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
-  const PORT = process.env.PORT || 3001;
+// Start server for production (Render) or local development
+const PORT = process.env.PORT || 3001;
 
-  // Connect to database and start server for local development
+// For Render and other production environments
+if (process.env.NODE_ENV === "production" || !process.env.VERCEL) {
+  // Connect to database and start server
   connectToDatabase()
     .then(() => {
       app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
+        console.log(`Server running on port ${PORT}`);
       });
     })
     .catch((err) => {
       console.error("Failed to start server:", err);
+      process.exit(1);
     });
 }
 
-// ✅ Export app for Vercel
+// ✅ Export app for Vercel (serverless)
 export default app;
