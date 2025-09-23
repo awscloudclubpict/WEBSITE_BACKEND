@@ -1,7 +1,15 @@
 import nodemailer from "nodemailer";
 
 const sendMail = async (req, res) => {
-  const { name, senderEmail, subject, title, abstract, category, additionalInfo } = req.body;
+  const {
+    name,
+    senderEmail,
+    subject,
+    title,
+    abstract,
+    category,
+    additionalInfo,
+  } = req.body;
 
   try {
     // let transporter = nodemailer.createTransport({
@@ -15,8 +23,8 @@ const sendMail = async (req, res) => {
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "kokareshraddha5@gmail.com",   // your email
-        pass: "",   // your Gmail App Password
+        user: "kokareshraddha5@gmail.com", // your email
+        pass: "", // your Gmail App Password
       },
     });
 
@@ -35,7 +43,6 @@ const sendMail = async (req, res) => {
 
     await transporter.sendMail(mailOptions);
     res.json({ message: "Email sent successfully!" });
-
   } catch (error) {
     console.error("Error sending email:", error);
     res.status(500).json({ error: "Failed to send email" });
