@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import teamMemberRoutes from "./routes/teamMemberRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
+import { addBlog, getAllBlogs, getBlogById, deleteBlog } from "./controllers/controllers/blogController.js";
+import { sendMail } from "./controllers/controllers/emailController.js";
 
 const app = express();
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
@@ -32,6 +34,15 @@ app.use("/team-members", teamMemberRoutes);
 app.get("/profile", authMiddleware, (req, res) => {
     res.json({ message: `Hello, ${req.user.email}, Role: ${req.user.role}` });
 });
+
+// Blog routes
+app.post("/addBlog", addBlog);
+app.get("/blogs", getAllBlogs);
+app.get("/blogs/:id", getBlogById);
+app.delete("/blogs/:id", deleteBlog);
+
+// Email route
+app.post("/sendEmail", sendMail);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
