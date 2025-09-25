@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+//import nodemailer from "nodemailer";
 
 const sendMail = async (req, res) => {
   const { name, senderEmail, subject, title, abstract, category, additionalInfo } = req.body;

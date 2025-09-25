@@ -5,8 +5,8 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import teamMemberRoutes from "./routes/teamMemberRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
-import { addBlog, getAllBlogs, getBlogById, deleteBlog } from "./controllers/controllers/blogController.js";
-import { sendMail } from "./controllers/controllers/emailController.js";
+import { addBlog, getAllBlogs, getBlogById, deleteBlog, upload as blogUpload } from "./controllers/blogController.js";
+import { sendMail } from "./controllers/emailController.js";
 
 const app = express();
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
@@ -36,7 +36,7 @@ app.get("/profile", authMiddleware, (req, res) => {
 });
 
 // Blog routes
-app.post("/addBlog", addBlog);
+app.post("/addBlog", authMiddleware, blogUpload.fields([{ name: 'thumbnail_image', maxCount: 1 }, { name: 'author_profile_image', maxCount: 1 }]), addBlog);
 app.get("/blogs", getAllBlogs);
 app.get("/blogs/:id", getBlogById);
 app.delete("/blogs/:id", deleteBlog);
