@@ -67,7 +67,14 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors({
+  origin: (origin, callback) => {
+    callback(null, true); // Allow all origins
+  },
+  credentials: true
+}));
+
 app.use(cookieParser());
 app.use(express.json());
 
