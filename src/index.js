@@ -54,7 +54,11 @@ import { authMiddleware } from "./middleware/authMiddleware.js";
 import eventRoutes from "./routes/eventRoutes.js";
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+//app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+
+app.use(cors({
+  origin: ["null", "*"]
+}));
 app.use(cookieParser());
 app.use(express.json());
 
