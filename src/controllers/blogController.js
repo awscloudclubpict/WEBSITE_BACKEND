@@ -132,4 +132,5 @@ const deleteBlog = async (req, res) => {
     }
 }
 
-export { addBlog, getAllBlogs, getBlogById, deleteBlog }
+//export { addBlog, getAllBlogs, getBlogById, deleteBlog }
+export default { addBlog, getAllBlogs, getBlogById, deleteBlog };
