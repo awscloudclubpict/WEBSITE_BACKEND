@@ -55,25 +55,34 @@ import certificateRouter from "./routes/certificate.route.js";
 const app = express();
 
 // CORS configuration for both development and production
+// const corsOptions = {
+//   origin:
+//     process.env.NODE_ENV === "production"
+//       ? [
+//           "https://your-frontend-domain.vercel.app", // Replace with your actual frontend domain
+//           "https://your-custom-domain.com", // Add any custom domains
+//         ]
+//       : ["http://localhost:3000", "http://localhost:3001"],
+//   credentials: true,
+//   optionsSuccessStatus: 200,
+// };
+
+// app.use(cors(corsOptions));
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     callback(null, true); // Allow all origins
+//   },
+//   credentials: true
+// }));
+
+// Allow requests from any origin
 const corsOptions = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? [
-          "https://your-frontend-domain.vercel.app", // Replace with your actual frontend domain
-          "https://your-custom-domain.com", // Add any custom domains
-        ]
-      : ["http://localhost:3000", "http://localhost:3001"],
-  credentials: true,
+  origin: "*",       // <-- allow all origins
+  credentials: true, // keep this if you need cookies/auth headers
   optionsSuccessStatus: 200,
 };
 
-// app.use(cors(corsOptions));
-app.use(cors({
-  origin: (origin, callback) => {
-    callback(null, true); // Allow all origins
-  },
-  credentials: true
-}));
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());
