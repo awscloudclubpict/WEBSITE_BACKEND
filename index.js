@@ -1,8 +1,8 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
-const { addBlog,getAllBlogs,getBlogById,deleteBlog } = require('./controllers/blogController.js')
-const { sendMail } = require('./controllers/emailController.js')
+const { addBlog,getAllBlogs,getBlogById,deleteBlog } = require('./src/controllers/controllers/blogController.js')
+const { sendMail } = require('./src/controllers/controllers/emailController.js')
 
 const app = express()
 app.use(cors())
