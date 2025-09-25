@@ -11,6 +11,7 @@ router.get("/category/:type", authMiddleware, (req, res) => EventController.getE
 router.put("/:event_id", authMiddleware, (req, res) => EventController.updateEvent(req, res));
 router.delete("/:event_id", authMiddleware, (req, res) => EventController.deleteEvent(req, res));
 
+
 // Debug endpoint to check JWT token
 router.get("/debug-token", authMiddleware, (req, res) => {
     res.json({
