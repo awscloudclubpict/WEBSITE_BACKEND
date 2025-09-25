@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Configure AWS S3
 const s3 = new AWS.S3({
-    accessKeyId:"AKIA6IY35PHRIKEZBPQR",
-    secretAccessKey:"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",
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     region: process.env.AWS_REGION || 'ap-south-1'
 });
 
