@@ -51,6 +51,8 @@ import teamMemberRoutes from "./routes/teamMemberRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import certificateRouter from "./routes/certificate.route.js";
+import blogRoutes from "./routes/blogRoutes.js";
+import emailRoutes from "./routes/emailRoutes.js";
 
 const app = express();
 
@@ -93,7 +95,8 @@ app.use((req, res, next) => {
   next();
 });
 
-const MONGO_URI = process.env.MONGO_URI;
+// const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://kokareshraddha5_db_user:kokareshraddha5_db_user@cluster0.0ort1bw.mongodb.net/awscc_blogs?retryWrites=true&w=majority&appName=Cluster0";
 
 let isConnected = false;
 
@@ -152,6 +155,10 @@ app.use("/auth", dbMiddleware, authRoutes);
 app.use("/events", dbMiddleware, eventRoutes);
 app.use("/team-members", dbMiddleware, teamMemberRoutes);
 app.use("/certificate", certificateRouter);
+// app.use("/blogs", dbMiddleware, blogRoutes);
+app.use("/blogs", blogRoutes);
+app.use("/email", emailRoutes);
+
 
 app.get("/profile", dbMiddleware, authMiddleware, (req, res) => {
   res.json({ message: `Hello, ${req.user.email}, Role: ${req.user.role}` });
