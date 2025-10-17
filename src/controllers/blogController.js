@@ -1,6 +1,7 @@
 import Blog from '../models/blog.model.js';
 import { uploadToS3, deleteFromS3 } from '../utils/s3.js';
 import multer from 'multer';
+import mongoose from 'mongoose';
 
 // Configure multer for memory storage (for S3 upload)
 const storage = multer.memoryStorage();
@@ -132,5 +133,71 @@ const deleteBlog = async (req, res) => {
     }
 }
 
+// Add blog with image upload (separate function for clarity)
+const addBlogWithImage = async (req, res) => {
+    if (req.user.role !== "admin") {
+        return res.status(403).json({ error: "Access denied. Admins only." });
+    }
+
+    try {
+        const { blog_id, title, author_name, short_description, tags, publish_date, share_url } = req.body;
+
+        let blogData = {
+            blog_id,
+            title,
+            author_name,
+            short_description,
+            tags,
+            publish_date: publish_date ? new Date(publish_date) : new Date(),
+            share_url
+        };
+
+        // Handle thumbnail image upload
+        if (req.files && req.files.thumbnail_image && req.files.thumbnail_image[0]) {
+            try {
+                const thumbnailUrl = await uploadToS3(
+                    req.files.thumbnail_image[0].buffer,
+                    req.files.thumbnail_image[0].originalname,
+                    req.files.thumbnail_image[0].mimetype,
+                    'blogs/thumbnails'
+                );
+                blogData.thumbnail_image_url = thumbnailUrl;
+            } catch (uploadError) {
+                return res.status(500).json({ error: "Failed to upload thumbnail image: " + uploadError.message });
+            }
+        }
+
+        // Handle author profile image upload
+        if (req.files && req.files.author_profile_image && req.files.author_profile_image[0]) {
+            try {
+                const profileUrl = await uploadToS3(
+                    req.files.author_profile_image[0].buffer,
+                    req.files.author_profile_image[0].originalname,
+                    req.files.author_profile_image[0].mimetype,
+                    'blogs/profiles'
+                );
+                blogData.author_profile_url = profileUrl;
+            } catch (uploadError) {
+                return res.status(500).json({ error: "Failed to upload author profile image: " + uploadError.message });
+            }
+        }
+
+        const newBlog = new Blog(blogData);
+        await newBlog.save();
+        res.status(201).json({ message: "Blog created successfully", blog: newBlog });
+    } catch (error) {
+        console.error("Error adding blog:", error.message);
+        if (error.code === 11000) {
+            return res.status(409).json({ error: "Blog ID already exists" });
+        }
+        res.status(500).json({ error: "Failed to create blog", details: error.message });
+    }
+};
+
+// Placeholder for updateBlogWithImage (can be implemented later)
+const updateBlogWithImage = async (req, res) => {
+    res.status(501).json({ error: "Update with image not implemented yet" });
+};
+
 //export { addBlog, getAllBlogs, getBlogById, deleteBlog }
-export default { addBlog, getAllBlogs, getBlogById, deleteBlog };
+export default { addBlog, getAllBlogs, getBlogById, deleteBlog, addBlogWithImage, updateBlogWithImage };
