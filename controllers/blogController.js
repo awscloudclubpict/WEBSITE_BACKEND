@@ -1,70 +1,92 @@
-const Blog = require('../../models/blog.model.js')
+import Blog from "../src/models/blog.model.js";
 
 const addBlog = async (req, res) => {
-    try {
-        const { blog_id, title, author_name, author_profile_url, thumbnail_image_url, short_description, tags, publish_date, share_url } = req.body
+  try {
+    const {
+      blog_id,
+      title,
+      author_name,
+      author_profile_url,
+      thumbnail_image_url,
+      short_description,
+      tags,
+      publish_date,
+      share_url,
+    } = req.body;
 
-        const newBlog = new Blog({
-            blog_id,
-            title,
-            author_name,
-            author_profile_url,
-            thumbnail_image_url,
-            short_description,
-            tags,
-            publish_date,
-            share_url
-        })
+    const newBlog = new Blog({
+      blog_id,
+      title,
+      author_name,
+      author_profile_url,
+      thumbnail_image_url,
+      short_description,
+      tags,
+      publish_date,
+      share_url,
+    });
 
-        await newBlog.save()
-        res.status(201).json({ message: "Blog created successfully", blog: newBlog })
-    } catch (error) {
-        console.error("Error adding blog:", error.message)
-        res.status(500).json({ error: "Failed to create blog", details: error.message })
-    }
-}
+    await newBlog.save();
+    res
+      .status(201)
+      .json({ message: "Blog created successfully", blog: newBlog });
+  } catch (error) {
+    console.error("Error adding blog:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to create blog", details: error.message });
+  }
+};
 
 // Fetch all blogs
 const getAllBlogs = async (req, res) => {
-    try {
-        const blogs = await Blog.find().sort({ publish_date: -1 }) // newest first
-        res.status(200).json(blogs)
-    } catch (error) {
-        console.error("Error fetching blogs:", error.message)
-        res.status(500).json({ error: "Failed to fetch blogs", details: error.message })
-    }
-}
+  try {
+    const blogs = await Blog.find().sort({ publish_date: -1 }); // newest first
+    res.status(200).json(blogs);
+  } catch (error) {
+    console.error("Error fetching blogs:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch blogs", details: error.message });
+  }
+};
 
 const getBlogById = async (req, res) => {
-    try {
-        const { id } = req.params
-        const blog = await Blog.findOne({ blog_id: id })
+  try {
+    const { id } = req.params;
+    const blog = await Blog.findOne({ blog_id: id });
 
-        if (!blog) {
-            return res.status(404).json({ error: "Blog not found" })
-        }
-
-        res.status(200).json(blog)
-    } catch (error) {
-        console.error("Error fetching blog:", error.message)
-        res.status(500).json({ error: "Failed to fetch blog", details: error.message })
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" });
     }
-}
+
+    res.status(200).json(blog);
+  } catch (error) {
+    console.error("Error fetching blog:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch blog", details: error.message });
+  }
+};
 
 const deleteBlog = async (req, res) => {
-    try {
-        const { id } = req.params
-        const deletedBlog = await Blog.findOneAndDelete({ blog_id: id })
+  try {
+    const { id } = req.params;
+    const deletedBlog = await Blog.findOneAndDelete({ blog_id: id });
 
-        if (!deletedBlog) {
-            return res.status(404).json({ error: "Blog not found" })
-        }
-
-        res.status(200).json({ message: "Blog deleted successfully", blog: deletedBlog })
-    } catch (error) {
-        console.error("Error deleting blog:", error.message)
-        res.status(500).json({ error: "Failed to delete blog", details: error.message })
+    if (!deletedBlog) {
+      return res.status(404).json({ error: "Blog not found" });
     }
-}
 
-module.exports = { addBlog, getAllBlogs, getBlogById, deleteBlog }
+    res
+      .status(200)
+      .json({ message: "Blog deleted successfully", blog: deletedBlog });
+  } catch (error) {
+    console.error("Error deleting blog:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to delete blog", details: error.message });
+  }
+};
+
+export { addBlog, getAllBlogs, getBlogById, deleteBlog };
