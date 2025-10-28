@@ -30,9 +30,23 @@ class EventController {
             return res.status(400).json({ error: result.error.errors });
         }
 
-        const eventData = result.data;
+        let eventData = result.data;
         eventData.date = new Date(eventData.date); // Convert string to Date
         eventData.createdBy = "admin"; // Default since no auth
+
+        // Handle image upload if file is provided
+        if (req.file) {
+            try {
+                const imageUrl = await uploadToS3(
+                    req.file.buffer,
+                    req.file.originalname,
+                    req.file.mimetype
+                );
+                eventData.banner_image_url = imageUrl;
+            } catch (uploadError) {
+                return res.status(500).json({ error: "Failed to upload image: " + uploadError.message });
+            }
+        }
 
         try {
             const event = new Event(eventData);
