@@ -24,10 +24,7 @@ export { upload };
 
 class EventController {
     async createEvent(req, res) {
-        if (req.user.role !== "admin") {
-            return res.status(403).json({ error: "Access denied. Admins only." });
-        }
-
+        console.log("Creating event with data:", req.body);
         const result = createEventSchema.safeParse(req.body);
         if (!result.success) {
             return res.status(400).json({ error: result.error.errors });
@@ -35,7 +32,7 @@ class EventController {
 
         const eventData = result.data;
         eventData.date = new Date(eventData.date); // Convert string to Date
-        eventData.createdBy = req.user.email;
+        eventData.createdBy = "admin"; // Default since no auth
 
         try {
             const event = new Event(eventData);
@@ -51,10 +48,7 @@ class EventController {
 
     // Create event with image upload to S3
     async createEventWithImage(req, res) {
-        if (req.user.role !== "admin") {
-            return res.status(403).json({ error: "Access denied. Admins only." });
-        }
-
+        console.log("Creating event with image, data:", req.body);
         try {
             const result = createEventWithImageSchema.safeParse(req.body);
             if (!result.success) {
@@ -63,7 +57,7 @@ class EventController {
 
             let eventData = result.data;
             eventData.date = new Date(eventData.date); // Convert string to Date
-            eventData.createdBy = req.user.email;
+            eventData.createdBy = "admin"; // Default since no auth
 
             // Handle image upload if file is provided
             if (req.file) {
@@ -128,9 +122,7 @@ class EventController {
             return res.status(404).json({ error: "Event not found" });
         }
 
-        if (req.user.role !== "admin" && event.createdBy !== req.user.email) {
-            return res.status(403).json({ error: "Access denied." });
-        }
+        // Removed auth check since no auth middleware
 
         const result = updateEventSchema.safeParse(req.body);
         if (!result.success) {
@@ -159,9 +151,7 @@ class EventController {
             return res.status(404).json({ error: "Event not found" });
         }
 
-        if (req.user.role !== "admin" && event.createdBy !== req.user.email) {
-            return res.status(403).json({ error: "Access denied." });
-        }
+        // Removed auth check since no auth middleware
 
         try {
             const result = updateEventSchema.safeParse(req.body);
@@ -213,9 +203,7 @@ class EventController {
             return res.status(404).json({ error: "Event not found" });
         }
 
-        if (req.user.role !== "admin" && event.createdBy !== req.user.email) {
-            return res.status(403).json({ error: "Access denied." });
-        }
+        // Removed auth check since no auth middleware
 
         try {
             // Delete image from S3 if it exists

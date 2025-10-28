@@ -22,10 +22,7 @@ const upload = multer({
 export { upload };
 
 const addBlog = async (req, res) => {
-    if (req.user.role !== "admin") {
-        return res.status(403).json({ error: "Access denied. Admins only." });
-    }
-
+    console.log("Creating blog with data:", req.body);
     try {
         // Extract all fields including publish_date
         const { title, author_name, short_description, tags, author_profile_url, share_url, publish_date } = req.body;
