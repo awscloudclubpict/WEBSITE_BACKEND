@@ -111,8 +111,9 @@ app.use("/team-members", teamMemberRoutes);
 // Connect to database on startup
 connectToDatabase();
 
-app.get("/profile", authMiddleware, (req, res) => {
-  res.json({ message: `Hello, ${req.user.email}, Role: ${req.user.role}` });
+// Removed authMiddleware from profile route as requested
+app.get("/profile", (req, res) => {
+  res.json({ message: "Profile endpoint - auth middleware removed" });
 });
 
 // ✅ For local development, uncomment the following lines:

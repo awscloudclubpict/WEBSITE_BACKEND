@@ -5,13 +5,14 @@ import {
     adminRegisterSchema,
     loginSchema
 } from "../validation/authSchemas.js";
-import { generateToken } from "../utils/jwt.js";
 import UserSchema from "../models/User.js";
 
 class AuthController {
     async registerStudent(req, res) {
+        console.log("Registering student with data:", req.body);
         const result = studentRegisterSchema.safeParse(req.body);
         if (!result.success) {
+            console.log("Validation failed for student registration:", result.error.errors);
             return res.status(400).json({ error: result.error.errors });
         }
 
@@ -19,6 +20,7 @@ class AuthController {
 
         const existingUser = await UserSchema.findOne({ email });
         if (existingUser) {
+            console.log("User already exists:", email);
             return res.status(409).json({ error: "User already exists" });
         }
 
@@ -36,15 +38,19 @@ class AuthController {
         });
 
         await user.save();
+        console.log("Student registered successfully:", user.email);
 
-        const token = generateToken({ email, role: "student" });
-        res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'lax' });
-        res.json({ token });
+        // Return the entire user object without password
+        const userResponse = user.toObject();
+        delete userResponse.password;
+        res.json({ user: userResponse });
     }
 
     async registerProfessional(req, res) {
+        console.log("Registering professional with data:", req.body);
         const result = professionalRegisterSchema.safeParse(req.body);
         if (!result.success) {
+            console.log("Validation failed for professional registration:", result.error.errors);
             return res.status(400).json({ error: result.error.errors });
         }
 
@@ -52,6 +58,7 @@ class AuthController {
 
         const existingUser = await UserSchema.findOne({ email });
         if (existingUser) {
+            console.log("User already exists:", email);
             return res.status(409).json({ error: "User already exists" });
         }
 
@@ -67,15 +74,19 @@ class AuthController {
         });
 
         await user.save();
+        console.log("Professional registered successfully:", user.email);
 
-        const token = generateToken({ email, role: "professional" });
-        res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'lax' });
-        res.json({ token });
+        // Return the entire user object without password
+        const userResponse = user.toObject();
+        delete userResponse.password;
+        res.json({ user: userResponse });
     }
 
     async registerAdmin(req, res) {
+        console.log("Registering admin with data:", req.body);
         const result = adminRegisterSchema.safeParse(req.body);
         if (!result.success) {
+            console.log("Validation failed for admin registration:", result.error.errors);
             return res.status(400).json({ error: result.error.errors });
         }
 
@@ -83,6 +94,7 @@ class AuthController {
 
         const existingUser = await UserSchema.findOne({ email });
         if (existingUser) {
+            console.log("User already exists:", email);
             return res.status(409).json({ error: "User already exists" });
         }
 
@@ -98,15 +110,19 @@ class AuthController {
         });
 
         await user.save();
+        console.log("Admin registered successfully:", user.email);
 
-        const token = generateToken({ email, role: "admin" });
-        res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'lax' });
-        res.json({ token });
+        // Return the entire user object without password
+        const userResponse = user.toObject();
+        delete userResponse.password;
+        res.json({ user: userResponse });
     }
 
     async login(req, res) {
+        console.log("Login attempt for email:", req.body.email);
         const result = loginSchema.safeParse(req.body);
         if (!result.success) {
+            console.log("Validation failed for login:", result.error.errors);
             return res.status(400).json({ error: result.error.errors });
         }
 
@@ -114,17 +130,22 @@ class AuthController {
 
         const user = await UserSchema.findOne({ email });
         if (!user) {
+            console.log("User not found:", email);
             return res.status(401).json({ error: "Invalid credentials" });
         }
 
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) {
+            console.log("Invalid password for user:", email);
             return res.status(401).json({ error: "Invalid credentials" });
         }
 
-        const token = generateToken({ email, role: user.role });
-        res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'lax' });
-        res.json({ token, fullName: user.fullName, email: user.email });
+        console.log("Login successful for user:", user.email);
+
+        // Return the entire user object without password
+        const userResponse = user.toObject();
+        delete userResponse.password;
+        res.json({ user: userResponse });
     }
 }
 

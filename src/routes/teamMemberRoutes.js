@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import TeamMemberController from "../controllers/teamMemberController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+// import { authMiddleware } from "../middleware/authMiddleware.js"; // Removed authMiddleware import
 
 const router = express.Router();
 
@@ -22,11 +22,11 @@ const upload = multer({
     }
 });
 
-// Create team member (admin only)
-router.post("/", authMiddleware, (req, res) => TeamMemberController.createTeamMember(req, res));
+// Create team member - removed authMiddleware
+router.post("/", (req, res) => TeamMemberController.createTeamMember(req, res));
 
-// Create team member with image upload (admin only)
-router.post("/create-with-image", authMiddleware, upload.single('profile_image'), (req, res) => TeamMemberController.createTeamMemberWithImage(req, res));
+// Create team member with image upload - removed authMiddleware
+router.post("/create-with-image", upload.single('profile_image'), (req, res) => TeamMemberController.createTeamMemberWithImage(req, res));
 
 // Get team members (public)
 router.get("/", (req, res) => TeamMemberController.getTeamMembers(req, res));
@@ -41,10 +41,10 @@ router.get("/social-media", (req, res) => TeamMemberController.getSocialMediaTea
 router.get("/documentation", (req, res) => TeamMemberController.getDocumentationTeam(req, res));
 router.get("/tech-blog", (req, res) => TeamMemberController.getTechBlogTeam(req, res));
 
-// Update team member (admin only)
-router.put("/:id", authMiddleware, (req, res) => TeamMemberController.updateTeamMember(req, res));
+// Update team member - removed authMiddleware
+router.put("/:id", (req, res) => TeamMemberController.updateTeamMember(req, res));
 
-// Delete team member (admin only)
-router.delete("/:id", authMiddleware, (req, res) => TeamMemberController.deleteTeamMember(req, res));
+// Delete team member - removed authMiddleware
+router.delete("/:id", (req, res) => TeamMemberController.deleteTeamMember(req, res));
 
 export default router;
