@@ -59,16 +59,16 @@ import blogRoutes from "./routes/blogRoutes.js";
 dotenv.config();
 
 const app = express();
-// Commented out old CORS config that allows all origins without credentials
-// app.use(cors({
-//   origin: ["null", "*"]
-// }));
+//Commented out old CORS config that allows all origins without credentials
+app.use(cors({
+  origin: ["null", "*"]
+}));
 
 // Updated CORS to allow specific origins and enable credentials for cookie auth
-app.use(cors({
-  origin: ["http://localhost:3000", "https://website-frontend-lkns.onrender.com"],
-  credentials: true
-}));
+// app.use(cors({
+//   origin: ["http://localhost:3000", "https://website-frontend-lkns.onrender.com"],
+//   credentials: true
+// }));
 app.use(cookieParser());
 app.use(express.json());
 
